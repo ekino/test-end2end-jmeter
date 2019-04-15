@@ -6,4 +6,6 @@ interface IRequestsAnalyzer {
 
     fun parse(results: List<ITestResult>) : List<List<Any>>
 
+    fun validate(results: List<ITestResult>, references: List<ITestResult>)
+
 }

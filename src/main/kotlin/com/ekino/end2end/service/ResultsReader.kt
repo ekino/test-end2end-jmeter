@@ -1,9 +1,6 @@
 package com.ekino.end2end.service
 
-import com.ekino.end2end.dto.ITestResult
-import com.ekino.end2end.dto.RequestTestResult
-import com.ekino.end2end.dto.ResultType
-import com.ekino.end2end.dto.VMTestResult
+import com.ekino.end2end.dto.*
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.IOException
@@ -12,24 +9,27 @@ class ResultsReader {
 
     companion object {
         private val RESULTS_FILENAME_PER_TYPE = mapOf(
-                Pair(ResultType.REQUEST, "scripts/jmeter_output.csv"),
-                Pair(ResultType.VM, "scripts/vm_output.csv"))
+                ResultType.REQUEST to mapOf(
+                        ResultOrigin.ACTUAL to "scripts/jmeter_output.csv",
+                        ResultOrigin.REFERENCE to "scripts/plot-reference/jmeter_output.csv"),
+                ResultType.VM to mapOf(
+                        ResultOrigin.ACTUAL to "scripts/vm_output.csv",
+                        ResultOrigin.REFERENCE to "scripts/plot-reference/vm_output.csv"))
         private val CSV_SEPARATOR_PER_TYPE = mapOf(
-                Pair(ResultType.REQUEST, ","),
-                Pair(ResultType.VM, ";"))
+                ResultType.REQUEST to ",",
+                ResultType.VM to ";")
         private val RESULT_CLASS_PER_TYPE : Map <ResultType, (List<String>) -> ITestResult> = mapOf(
-                Pair(ResultType.REQUEST, { columns -> RequestTestResult(columns) }),
-                Pair(ResultType.VM, { columns -> VMTestResult(columns) })
-        )
+                ResultType.REQUEST to { columns -> RequestTestResult(columns) },
+                ResultType.VM to { columns -> VMTestResult(columns) })
     }
 
-    fun readResults(type: ResultType) : List<ITestResult> {
+    fun readResults(type: ResultType, origin: ResultOrigin) : List<ITestResult> {
         var fileReader: BufferedReader? = null
 
         val results = ArrayList<ITestResult>()
         try {
 
-            fileReader = BufferedReader(FileReader(RESULTS_FILENAME_PER_TYPE[type]))
+            fileReader = BufferedReader(FileReader(RESULTS_FILENAME_PER_TYPE[type]!![origin]))
 
             var line = fileReader.readLine()
             while (line != null) {

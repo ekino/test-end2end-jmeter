@@ -17,6 +17,8 @@ class RequestsResultsAnalyzer : IRequestsAnalyzer {
                 "homepage" to { result -> result.requestUrl.endsWith("www.homepage.com")}
         // TODO insert here the different regexes to identify the different workflows
                 )
+
+        private val PERCENTILES = listOf(80, 90, 95)
     }
 
     override fun parse(results: List<ITestResult>) : List<List<Any>> {
@@ -33,17 +35,40 @@ class RequestsResultsAnalyzer : IRequestsAnalyzer {
         return dataToPrint
     }
 
+    override fun validate(results: List<ITestResult>, references: List<ITestResult>) {
+        // grouping the results per components
+        val parsedResults = parse(results).groupBy { entry -> entry[1] }
+        val parsedReferences = parse(references).groupBy { entry -> entry[1] }
+
+        COMPONENTS.forEach{
+            (name, predicate) ->
+            run {
+                assert(fromPercentage(parsedResults[name]!![0][3].toString()) <= fromPercentage(parsedReferences[name]!![0][3].toString())) { "Error percentage too high for $name" }
+
+                PERCENTILES.forEachIndexed{
+                    index, percentile -> assert(parsedResults[name]!![0][index + 4].toString().toInt() <= parsedReferences[name]!![0][index + 4].toString().toInt()) { "$percentile percentile response time too high for $name" }
+                }
+            }
+        }
+    }
+
+    private fun fromPercentage(percentage: String) : Float {
+        return "(\\d) %".toRegex().find(percentage)!!.groupValues[1].toFloat()
+    }
+
     private fun parseSingleComponent(component: String, date: String, results: List<RequestTestResult>) : List<Any> {
-        return listOf(
+        val singleLine = mutableListOf(
                 date,
                 component,
                 countRequests(results),
-                errorPercentage(results),
-                findPercentile(80, results),
-                findPercentile(90, results),
-                findPercentile(95, results),
-                findPercentile(99, results)
+                errorPercentage(results)
         )
+
+        PERCENTILES.forEach{
+            percentile -> singleLine.add(findPercentile(percentile, results))
+        }
+
+        return singleLine
     }
 
     private fun countRequests(results: List<RequestTestResult>) : Int {

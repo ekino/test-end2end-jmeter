@@ -32,6 +32,22 @@ class VMResultsAnalyzer : IRequestsAnalyzer {
         return dataToPrint
     }
 
+    override fun validate(results: List<ITestResult>, references: List<ITestResult>) {
+        // grouping the results per components
+        val parsedResults = parse(results).groupBy { entry -> "${entry[1]}-${entry[2]}" }
+        val parsedReferences = parse(references).groupBy { entry -> "${entry[1]}-${entry[2]}" }
+
+        SERVICES.forEach { service ->
+            METRICS.forEach { metric ->
+                run {
+                    val key = "$service-$metric"
+                    assert(parsedResults[key]!![0][3].toString().toFloat() <= parsedReferences[key]!![0][3].toString().toFloat()) { "Error mean too high for $key" }
+                    assert(parsedResults[key]!![0][4].toString().toFloat() <= parsedReferences[key]!![0][4].toString().toFloat()) { "Error deviation too high for $key" }
+                }
+            }
+        }
+    }
+
     private fun parseSingleComponent(service: String, metric: String, date: String, results: List<VMTestResult>) : List<String> {
         return listOf(
                 date,
