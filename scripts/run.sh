@@ -27,7 +27,7 @@ fi
 
 run_nr()
 {
-	$CUR_DIR/apache-jmeter-5.1.1/bin/jmeter.sh -n -t $CUR_DIR/plan.jmx
+	$CUR_DIR/apache-jmeter-5.1.1/bin/jmeter.sh -Joutput_file=$CUR_DIR/jmeter_output.csv -n -t $CUR_DIR/plan.jmx
 }
 
 run_load()

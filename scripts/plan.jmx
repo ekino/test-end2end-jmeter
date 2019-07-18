@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="4.0" jmeter="4.0 r1823414">
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.1.1 r1855137">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Plan de test" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
@@ -53,8 +53,18 @@
             <hostname>true</hostname>
           </value>
         </objProp>
-        <stringProp name="filename">scripts/jmeter_output.csv</stringProp>
+        <stringProp name="filename">${output_file}</stringProp>
       </ResultCollector>
+      <hashTree/>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="output_file" elementType="Argument">
+            <stringProp name="Argument.name">output_file</stringProp>
+            <stringProp name="Argument.value">${__P(output_file,scripts/jmeter_output.csv)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
       <hashTree/>
     </hashTree>
   </hashTree>
