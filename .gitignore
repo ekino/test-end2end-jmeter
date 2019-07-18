@@ -1,13 +1,11 @@
 newman
 jmeter.log
-scripts/output.csv
-scripts/cloudwatch_data.csv
+scripts/jmeter_output.csv
+scripts/vm_output.csv
 scripts/output/
 .DS_Store
 *~
-scripts/apache-jmeter-4.0/backups/
-scripts/run_perf_tests.sh
-scripts/run_load_tests.sh
+scripts/apache-jmeter-5.1.1/backups/
 tokens/
 .gradle/
 .idea/
